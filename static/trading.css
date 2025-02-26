@@ -1,0 +1,527 @@
+body {
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: background-color 0.3s, color 0.3s;
+    user-select: none; /* Запрещаем выделение текста */
+}
+
+body.dark-mode {
+    background-color: #1e2a38;
+    color: #ddd;
+}
+
+.tabs-panel {
+    height: 60px;
+    background: linear-gradient(135deg, #f0f3f9, #e0e6ed);
+    padding: 0 10px;
+    flex-shrink: 0;
+    transition: background 0.3s;
+}
+
+body.dark-mode .tabs-panel {
+    background: linear-gradient(135deg, #2e3b4e, #1e2a38);
+}
+
+.nav-tabs .nav-link {
+    padding: 5px 15px;
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border-radius: 20px;
+    transition: background 0.2s;
+}
+
+.nav-tabs .nav-link.active {
+    background: linear-gradient(135deg, #00C087, #26a69a);
+    color: #fff;
+    border: none;
+}
+
+body.dark-mode .nav-tabs .nav-link.active {
+    background: linear-gradient(135deg, #3e4b5e, #2e3b4e);
+}
+
+.ticker-name {
+    margin-right: 10px;
+    font-weight: 600;
+    font-family: 'Arial', sans-serif;
+}
+
+.ticker-price {
+    margin-right: 10px;
+}
+
+.btn-close {
+    font-size: 12px;
+}
+
+.balance {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.account-badge {
+    border-radius: 30px;
+    height: 50px;
+    color: #688161;
+    border-color: #688161;
+}
+
+.account-badge:hover {
+    background: #688161;
+    color: white;
+    border-color: #688161;
+}
+
+.app-content {
+    padding: 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: row;
+    min-height: 0;
+    transition: background-color 0.3s;
+}
+
+body.dark-mode .app-content {
+    background-color: #1e2a38;
+}
+
+.chart-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-controls {
+    margin-bottom: 10px;
+}
+
+.chart-controls .btn {
+    padding: 5px 15px;
+    font-size: 14px;
+    border-radius: 20px;
+}
+
+.chart-controls .btn.active {
+    background-color: #00C087;
+    color: #fff;
+    border-color: #00C087;
+}
+
+.order-buttons {
+    margin-left: 10px;
+}
+
+.canvas-container {
+    flex-grow: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-canvas {
+    width: 100%;
+    height: 85%;
+    background: transparent;
+    border-radius: 8px;
+    transition: background 0.3s ease;
+}
+
+body.dark-mode .chart-canvas {
+    background: transparent;
+}
+
+.mini-chart-canvas {
+    width: 100%;
+    height: 10%;
+    margin-top: 5px;
+    background: #f5f7fa;
+    cursor: ew-resize;
+    border-radius: 4px;
+}
+
+body.dark-mode .mini-chart-canvas {
+    background: #354052;
+}
+
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 20;
+    display: none;
+}
+
+body.dark-mode .loading-overlay {
+    background: rgba(30, 42, 56, 0.8);
+    color: #ddd;
+}
+
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: 10px;
+}
+
+.performance-metrics {
+    font-size: 12px;
+    color: #666;
+    margin-top: 10px;
+    z-index: 10;
+}
+
+.performance-metrics span {
+    margin-right: 10px;
+}
+
+body.dark-mode .performance-metrics {
+    color: #bbb;
+}
+
+.timeframe-buttons .btn {
+    font-size: 0.9em;
+    padding: 4px 8px;
+}
+
+.timeframe-buttons .btn.active {
+    background-color: #00C087;
+    color: white;
+    border-color: #00C087;
+}
+
+.right-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.app-orderbook, .app-model-settings, .app-console, .portfolio, #portfolio-stats, #trading-schedule, #trade-history {
+    background: #fff;
+    transition: background-color 0.3s, color 0.3s;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    padding: 15px;
+}
+
+body.dark-mode .app-orderbook,
+body.dark-mode .app-model-settings,
+body.dark-mode .app-console,
+body.dark-mode .portfolio,
+body.dark-mode #portfolio-stats,
+body.dark-mode #trading-schedule,
+body.dark-mode #trade-history {
+    background: #2e3b4e;
+    color: #ddd;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.app-orderbook {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.orderbook-table {
+    max-height: 460px;
+    overflow-y: auto;
+    font-size: 0.9em;
+}
+
+.orderbook-table table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+.orderbook-table th, .orderbook-table td {
+    padding: 6px 8px;
+    text-align: right;
+    border-bottom: 1px solid #ddd;
+}
+
+.orderbook-table th:nth-child(1), .orderbook-table td:nth-child(1) { width: 33%; }
+.orderbook-table th:nth-child(2), .orderbook-table td:nth-child(2) { width: 33%; }
+.orderbook-table th:nth-child(3), .orderbook-table td:nth-child(3) { width: 33%; }
+
+.orderbook-table th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+body.dark-mode .orderbook-table th {
+    background-color: #3e4b5e;
+}
+
+.orderbook-table .text-danger { color: #dc3545; }
+.orderbook-table .text-success { color: #28a745; }
+.orderbook-table .fw-bold { font-weight: bold; }
+
+.orderbook-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+}
+
+.bids, .asks {
+    flex: 1;
+    margin: 0;
+    padding: 0;
+}
+
+.orderbook-row {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    margin-bottom: 4px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    transition: transform 0.2s, background 0.2s;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+body.dark-mode .orderbook-row {
+    background: #3e4b5e;
+}
+
+.orderbook-row:hover {
+    transform: scale(1.02);
+    background: #e9ecef;
+}
+
+body.dark-mode .orderbook-row:hover {
+    background: #4e5b6e;
+}
+
+.orderbook-row .price,
+.orderbook-row .quantity,
+.orderbook-row .sum {
+    flex: 1;
+    text-align: center;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.quantity-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    opacity: 0.3;
+    z-index: -1;
+    border-radius: 6px;
+    transition: width 0.2s ease;
+}
+
+.bid-bar {
+    background: linear-gradient(90deg, #00C087, transparent);
+}
+
+.ask-bar {
+    background: linear-gradient(90deg, #FF5252, transparent);
+}
+
+@media (max-width: 768px) {
+    .orderbook-container {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .bids, .asks {
+        width: 100%;
+    }
+
+    .orderbook-row {
+        padding: 6px 8px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .orderbook-row {
+        padding: 4px 6px;
+        font-size: 10px;
+    }
+}
+
+.portfolio {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.portfolio-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 12px;
+    margin-bottom: 4px;
+    background: #f8f9fa;
+    border-radius: 6px;
+}
+
+body.dark-mode .portfolio-row {
+    background: #3e4b5e;
+}
+
+.portfolio-row span {
+    flex: 1;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.portfolio-balance {
+    background: #e0f7fa !important; /* Светло-голубой фон для выделения */
+    font-weight: bold;
+}
+
+body.dark-mode .portfolio-balance {
+    background: #4e5b6e !important;
+}
+
+#portfolio-stats, #trading-schedule, #trade-history {
+    flex: 0 0 auto;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+#trade-history table {
+    width: 100%;
+    font-size: 0.9em;
+}
+
+#trade-history th, #trade-history td {
+    padding: 6px 8px;
+    text-align: center;
+}
+
+.app-model-settings {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.app-model-settings .form-label {
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.app-model-settings .form-control,
+.app-model-settings .form-select {
+    font-size: 14px;
+    padding: 6px 12px;
+}
+
+#save-strategy-btn {
+    font-size: 14px;
+    padding: 6px 12px;
+}
+
+#start-bot-btn {
+    font-size: 14px;
+    padding: 8px 16px;
+}
+
+#reset-settings-btn {
+    font-size: 14px;
+    padding: 8px;
+}
+
+@media (max-width: 768px) {
+    .app-model-settings .form-control,
+    .app-model-settings .form-select {
+        font-size: 12px;
+    }
+
+    #save-strategy-btn, #start-bot-btn, #reset-settings-btn {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+}
+
+.app-console {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    flex: 0 0 200px;
+    overflow-y: auto;
+    display: block;
+}
+
+.app-console.hidden {
+    display: none;
+}
+
+.no-ticker-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    color: #888;
+    display: none;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    background: #fff;
+    z-index: 10;
+    font-family: 'Arial', sans-serif;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.no-ticker-message p {
+    margin-bottom: 20px;
+}
+
+.no-ticker-message .btn-primary {
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 8px;
+}
+
+body.dark-mode .no-ticker-message {
+    color: #ccc;
+    background: #1e2a38;
+}
+
+.app-content.no-tickers #content-area,
+.app-content.no-tickers #chart-wrapper {
+    display: none;
+}
+
+.app-content.no-tickers #no-ticker-message {
+    display: flex;
+}
+
+.dropdown-menu {
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+body.dark-mode .dropdown-menu {
+    background-color: #2e3b4e;
+    color: #ddd;
+}
+
+.dropdown-item:hover {
+    background-color: #e0e6ed;
+}
+
+body.dark-mode .dropdown-item:hover {
+    background-color: #3e4b5e;
+}

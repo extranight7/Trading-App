@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Торговый Бот - Торговля</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="/static/trading.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+</head>
+<body>
+    <div class="tabs-panel bg-light d-flex justify-content-between align-items-center">
+        <ul class="nav nav-tabs" id="tickerTabs" role="tablist">
+            <li class="nav-item" id="add-tab">
+                <button class="nav-link" id="add-tab-btn" type="button" data-bs-toggle="modal" data-bs-target="#addTickerModal" aria-label="Добавить новый тикер">
+                    <span>+</span>
+                </button>
+            </li>
+        </ul>
+        <div class="d-flex align-items-center me-3">
+            <span class="balance me-3">Баланс: <span id="account-balance">Загрузка...</span></span>
+            <div class="form-check form-switch me-3">
+                <input class="form-check-input" type="checkbox" id="mode-toggle">
+                <label class="form-check-label" for="mode-toggle" id="mode-label">Обучение</label>
+            </div>
+            <button id="dark-mode-toggle" class="btn btn-outline-secondary me-2"><i class="ti ti-moon"></i></button>
+            <button class="btn btn-outline-primary account-badge" data-bs-toggle="modal" data-bs-target="#accountModal">
+                <i class="ti ti-user-circle"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="app-content d-flex flex-row" id="app-content">
+        <div class="chart-wrapper flex-grow-1 d-flex flex-column" style="margin-right: 25px;">
+            <div class="chart-controls d-flex justify-content-between mb-2" style="background: #efefef; padding: 10px; border-radius: 20px;">
+                <div class="left-controls d-flex">
+                    <button class="btn btn-outline-secondary me-2" id="line-chart-btn"><i class="ti ti-chart-line" style="font-size: 25px;"></i></button>
+                    <button class="btn btn-outline-secondary me-2" id="candle-chart-btn"><i class="ti ti-chart-candle" style="font-size: 25px;"></i></button>
+                    <button class="btn btn-outline-secondary me-2" id="volume-chart-btn"><i class="ti ti-chart-bar" style="font-size: 25px;"></i></button>
+                    <div class="order-buttons d-flex" id="order-buttons" style="display: none;">
+                        <button class="btn btn-success me-2" id="buy-btn" onclick="placeOrder('buy')">Купить</button>
+                        <button class="btn btn-danger" id="sell-btn" onclick="placeOrder('sell')">Продать</button>
+                    </div>
+                    <button id="live-mode-btn" class="btn btn-outline-secondary me-2">LIVE</button>
+                    
+                </div>
+                <div class="right-controls d-flex">
+                    <div class="dropdown me-2">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="timeframeDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="width: 150px; height: 39px;">
+                            Таймфрейм: 1D <i class="ti ti-clock-hour-7" style="font-size: 25px;"></i>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="timeframeDropdown">
+                            <li><button class="dropdown-item timeframe-btn" data-timeframe="1m">1 минута</button></li>
+                            <li><button class="dropdown-item timeframe-btn" data-timeframe="5m">5 минут</button></li>
+                            <li><button class="dropdown-item timeframe-btn" data-timeframe="1h">1 час</button></li>
+                            <li><button class="dropdown-item timeframe-btn" data-timeframe="1d" disabled>1 день</button></li>
+                        </ul>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuClickableInside" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" style="width: 120px;">
+                            Данные
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuClickableInside">
+                            <li style="padding: 5px 10px;" class="d-flex align-items-center">
+                                <input class="form-check-input me-2" type="checkbox" id="sma-checkbox" checked>
+                                <label class="form-check-label me-2" for="sma-checkbox">SMA</label>
+                                <span class="tooltip-icon" data-bs-toggle="tooltip" data-bs-placement="right" title="Скользящая средняя (SMA) — усреднённая цена за период, помогает сглаживать колебания и выявлять тренды."><i class="ti ti-question-mark"></i></span>
+                            </li>
+                            <li style="padding: 5px 10px;" class="d-flex align-items-center">
+                                <input class="form-check-input me-2" type="checkbox" id="rsi-checkbox" checked>
+                                <label class="form-check-label me-2" for="rsi-checkbox">RSI</label>
+                                <span class="tooltip-icon" data-bs-toggle="tooltip" data-bs-placement="right" title="Индекс относительной силы (RSI) — измеряет силу тренда и перекупленность/перепроданность (0-100)."><i class="ti ti-question-mark"></i></span>
+                            </li>
+                            <li style="padding: 5px 10px;" class="d-flex align-items-center">
+                                <input class="form-check-input me-2" type="checkbox" id="macd-checkbox">
+                                <label class="form-check-label me-2" for="macd-checkbox">MACD</label>
+                                <span class="tooltip-icon" data-bs-toggle="tooltip" data-bs-placement="right" title="Скользящее среднее схождение/расхождение (MACD) — показывает разницу между двумя EMA, используется для сигналов покупки/продажи."><i class="ti ti-question-mark"></i></span>
+                            </li>
+                            <li style="padding: 5px 10px;" class="d-flex align-items-center">
+                                <input class="form-check-input me-2" type="checkbox" id="bollinger-checkbox">
+                                <label class="form-check-label me-2" for="bollinger-checkbox">Bollinger</label>
+                                <span class="tooltip-icon" data-bs-toggle="tooltip" data-bs-placement="right" title="Полосы Боллинджера — показывают волатильность, границы вокруг SMA для выявления перекупленности/перепроданности."><i class="ti ti-question-mark"></i></span>
+                            </li>
+                            <li style="padding: 5px 10px;" class="d-flex align-items-center">
+                                <input class="form-check-input me-2" type="checkbox" id="vwap-checkbox">
+                                <label class="form-check-label me-2" for="vwap-checkbox">VWAP</label>
+                                <span class="tooltip-icon" data-bs-toggle="tooltip" data-bs-placement="right" title="Средневзвешенная цена по объёму (VWAP) — средняя цена с учётом объёма, используется как ориентир для трейдеров."><i class="ti ti-question-mark"></i></span>
+                            </li>
+                            <li style="padding: 5px 10px;" class="d-flex align-items-center">
+                                <input class="form-check-input me-2" type="checkbox" id="stochastic-checkbox">
+                                <label class="form-check-label me-2" for="stochastic-checkbox">Stochastic</label>
+                                <span class="tooltip-icon" data-bs-toggle="tooltip" data-bs-placement="right" title="Стохастический осциллятор — сравнивает текущую цену с диапазоном за период, выявляет перекупленность/перепроданность."><i class="ti ti-question-mark"></i></span>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li style="padding: 5px 10px;" class="d-flex align-items-center">
+                                <input class="form-check-input me-2" type="checkbox" id="drawing-checkbox">
+                                <label class="form-check-label" for="drawing-checkbox">Рисование линий</label>
+                            </li>
+                            <li style="padding: 5px 10px;" class="d-flex align-items-center">
+                                <button class="btn btn-link p-0" id="clear-drawing-btn" style="display: none;">Очистить линии</button>
+                            </li>
+                            <li style="padding: 5px 10px;" class="d-flex align-items-center">
+                                <input class="form-check-input me-2" type="checkbox" id="show-gaps-checkbox" checked>
+                                <label class="form-check-label" for="show-gaps-checkbox">Показывать разрывы</label>
+                            </li>
+                            <li style="padding: 5px 10px;" class="d-flex align-items-center">
+                                <button class="btn btn-link p-0" id="clear-cache-btn">Очистить кэш</button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="canvas-container flex-grow-1 position-relative">
+                <canvas id="chart-canvas" class="chart-canvas"></canvas>
+                <canvas id="mini-chart-canvas" class="mini-chart-canvas"></canvas>
+                <div id="chart-loading" class="loading-overlay">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p>Загрузка...</p>
+                </div>
+            </div>
+            <div class="performance-metrics mt-2">
+                <p>Изменение цены:</p>
+                <span id="change-ytd">С начала года: Загрузка...</span> |
+                <span id="change-year">За год: Загрузка...</span> |
+                <span id="change-month">За месяц: Загрузка...</span> |
+                <span id="change-week">За неделю: Загрузка...</span> |
+                <span id="change-day">За день: Загрузка...</span>
+            </div>
+            <div class="timeframe-buttons mt-2 d-flex justify-content-center gap-2">
+                <button class="btn btn-outline-secondary timeframe-btn" data-timeframe="5m">5 мин</button>
+                <button class="btn btn-outline-secondary timeframe-btn" data-timeframe="15m">15 мин</button>
+                <button class="btn btn-outline-secondary timeframe-btn" data-timeframe="30m">30 мин</button>
+                <button class="btn btn-outline-secondary timeframe-btn" data-timeframe="1h">1 час</button>
+                <button class="btn btn-outline-secondary timeframe-btn" data-timeframe="4h">4 часа</button>
+                <button class="btn btn-outline-secondary timeframe-btn" data-timeframe="1d" disabled>День</button>
+                <button class="btn btn-outline-secondary timeframe-btn" data-timeframe="1w">Неделя</button>
+                <button class="btn btn-outline-secondary timeframe-btn" data-timeframe="1M">Месяц</button>
+            </div>
+            <div id="market-status" class="alert mt-2" style="display: none;"></div>
+        </div>
+        <div class="right-panel flex-grow-1 d-flex flex-column">
+            <div class="row flex-grow-1" style="min-height: 0;">
+                <div class="col-6 d-flex flex-column">
+                    <div class="app-orderbook border rounded p-3 flex-grow-1">
+                        <h5>Стакан торгов</h5>
+                        <div id="orderbook-area">Стакан будет загружен...</div>
+                    </div>
+                    <div class="portfolio border rounded p-3 mt-3 flex-grow-1">
+                        <h5>Портфолио</h5>
+                        <div id="portfolio-area">Портфолио будет загружено...</div>
+                    </div>
+                    <div id="portfolio-stats" class="border rounded p-3 mt-3">
+                        <h5>Статистика портфеля</h5>
+                        <p>Загрузка...</p>
+                    </div>
+                </div>
+                <div class="col-6 d-flex flex-column">
+                    <div class="app-model-settings border rounded p-3 flex-grow-1">
+                        <h5>Настройки модели</h5>
+                        <div class="mb-3">
+                            <label for="trade-mode" class="form-label">Режим торговли:</label>
+                            <select class="form-select" id="trade-mode">
+                                <option value="training" selected>Обучение</option>
+                                <option value="real">Реальная торговля</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="strategy-select" class="form-label">Стратегия:</label>
+                            <select class="form-select" id="strategy-select">
+                                <option value="scalping">Скальпинг</option>
+                            </select>
+                        </div>
+                        <div id="strategy-settings" class="mb-3">
+                            <!-- Динамические настройки будут добавляться через JS -->
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button class="btn btn-primary" id="start-bot-btn">Запустить бота</button>
+                            <button class="btn btn-outline-secondary" id="reset-settings-btn"><i class="ti ti-reload"></i></button>
+                        </div>
+                    </div>
+                    <div id="trading-schedule" class="border rounded p-3 mt-3">
+                        <h5>Расписание торгов</h5>
+                        <p>Загрузка...</p>
+                    </div>
+                    <div id="trade-history" class="border rounded p-3 mt-3 overflow-auto">
+                        <h5>История сделок</h5>
+                        <p>Загрузка...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="app-console border rounded p-3 mt-3" style="flex: 0 0 200px; overflow-y: auto;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5>Консоль</h5>
+                    <button class="btn btn-outline-secondary btn-sm" id="copy-console-btn">Копировать</button>
+                </div>
+                <div id="console-output">Консоль приложения...</div>
+            </div>
+        </div>
+        <div class="no-ticker-message" id="no-ticker-message">
+            <div>
+                <p>Выберите тикер для начала работы</p>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTickerModal">Выбрать акцию</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для ввода тикера -->
+    <div class="modal fade" id="addTickerModal" tabindex="-1" aria-labelledby="addTickerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header modal-t-h">
+                    <h5 class="modal-title" id="addTickerModalLabel">Добавить новый тикер</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body modal-t-b">
+                    <form id="addTickerForm">
+                        <div class="mb-3">
+                            <input type="text" class="form-control start-area" id="tickerInput" placeholder="Например, VKCO">
+                        </div>
+                        <button type="button" class="btn btn-outline-secondary start-bth" id="addTickerSubmit">Добавить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно аккаунта -->
+    <div class="modal fade" id="accountModal" tabindex="-1" aria-labelledby="accountModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="accountModalLabel">Информация об аккаунте</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Account ID:</strong> <span id="account-id">Загрузка...</span></p>
+                    <p><strong>Название счёта:</strong> <span id="account-name">Загрузка...</span></p>
+                    <p><strong>Статус токена:</strong> <span id="token-status">Загрузка...</span></p>
+                    <p><strong>Баланс:</strong> <span id="modal-account-balance">Загрузка...</span></p>
+                    <div id="virtual-balance-section" class="mb-3" style="display: none;">
+                        <label for="virtual-balance-input" class="form-label"><strong>Виртуальный баланс (₽):</strong></label>
+                        <input type="number" class="form-control" id="virtual-balance-input" value="1000000" step="1000" min="1000">
+                    </div>
+                    <div class="mb-3">
+                        <label for="timezone-select" class="form-label"><strong>Часовой пояс:</strong></label>
+                        <select class="form-select" id="timezone-select">
+                            <option value="Europe/Kaliningrad">Калининград (UTC+2)</option>
+                            <option value="Europe/Moscow" selected>Москва (UTC+3)</option>
+                            <option value="Europe/Samara">Самара (UTC+4)</option>
+                            <option value="Asia/Yekaterinburg">Екатеринбург (UTC+5)</option>
+                            <option value="Asia/Omsk">Омск (UTC+6)</option>
+                            <option value="Asia/Novosibirsk">Новосибирск (UTC+7)</option>
+                            <option value="Asia/Krasnoyarsk">Красноярск (UTC+7)</option>
+                            <option value="Asia/Irkutsk">Иркутск (UTC+8)</option>
+                            <option value="Asia/Yakutsk">Якутск (UTC+9)</option>
+                            <option value="Asia/Vladivostok">Владивосток (UTC+10)</option>
+                            <option value="Asia/Magadan">Магадан (UTC+11)</option>
+                            <option value="Asia/Sakhalin">Сахалин (UTC+11)</option>
+                            <option value="Asia/Kamchatka">Камчатка (UTC+12)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input class="form-check-input" type="checkbox" id="dev-mode-checkbox" checked>
+                        <label class="form-check-label" for="dev-mode-checkbox">Режим разработки</label>
+                    </div>
+                    <button class="btn btn-primary mt-2" id="save-timezone-btn">Сохранить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        const initialData = {{ {'ticker': ticker | default(''), 'figi': figi | default(''), 'timestamp': timestamp | default(0)} | tojson }};
+        console.log("Raw ticker: '{{ ticker | default('') }}'");
+        console.log("Raw figi: '{{ figi | default('') }}'");
+        console.log("Initial data parsed:", initialData);
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script type="module" src="/static/utils.js"></script>
+    <script type="module" src="/static/ml_model.js"></script>
+    <script type="module" src="/static/bot_trading.js"></script>
+    <script type="module" src="/static/bot_chart.js"></script>
+    <script type="module" src="/static/trading.js?v={{ timestamp }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+</body>
+</html>

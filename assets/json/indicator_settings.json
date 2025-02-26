@@ -1,0 +1,1 @@
+{"timezone": "Asia/Krasnoyarsk", "indicators": {"sma": false, "rsi": false, "macd": false, "bollinger": false, "vwap": false, "stochastic": false}, "strategySettings": {"scalping": {"period": 5, "profitTarget": 0.5, "stopLoss": 0.2, "volume": 1}}}

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Trading Bot</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="static/style.css" rel="stylesheet">
+
+</head>
+<body>
+    <div class="window-container">
+        <!-- Кастомный заголовок -->
+        <div class="custom-titlebar" id="titlebar">
+            <span>Торговый Бот</span>
+            <div class="titlebar-buttons">
+                <button id="minimize-btn">_</button>
+                <button id="close-btn">×</button>
+            </div>
+        </div>
+        <!-- Основной контент -->
+        <div class="content">
+            <div class="main">
+                <div class="install">
+                    <div class="startbox">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="start-1"><br><br>
+                                    <h2>Настройка и проверка</h2><br>
+                                    <div class="row">
+                                        <div class="col-lg-7">
+                                            <span class="install-text">Торговая биржа</span><br><br>
+                                            <span class="install-text">Статус соединения</span><br><br>
+                                            <span class="install-text">Токен Аккаунта</span><br><br>
+                                        </div>
+                                        <div class="col-lg-5">
+                                            <span class="install-text"><span class="badge text-success"><svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-check"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg></span> Тинькофф</span><br><br>
+                                            <span class="install-text" id="connection-status"><span class="badge text-danger"><svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-exclamation-circle"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 9v4" /><path d="M12 16v.01" /></svg></span> Не подключено</span><br><br>
+                                            <span class="install-text" id="token-status"><span class="badge text-danger"><svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-exclamation-circle"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 9v4" /><path d="M12 16v.01" /></svg></span> Недоступно</span><br><br>
+                                        </div>
+                                    </div>
+                                    
+                                    <div id="alert-container" class="position-fixed top-0 end-0 p-3" style="z-index: 9999;"></div>
+                                    
+                                    <div class="input-group input-group-lg">
+                                        <input type="text" class="form-control start-area install-input" id="token-input" placeholder="Введите токен"  aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg">
+                                        <button class="btn btn-outline-secondary start-bth" type="button" id="check-token">Проверить</button>
+                                    </div>
+                                    <br><br>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div><button class="install-btn-big btn disabled-btn" id="start-bot" disabled>Запустить бота</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+    const tokenInput = document.getElementById('token-input');
+    const checkTokenBtn = document.getElementById('check-token');
+    const startBotBtn = document.getElementById('start-bot');
+    const connectionStatus = document.getElementById('connection-status');
+    const tokenStatus = document.getElementById('token-status');
+
+    // Функция для добавления класса ошибки к полю ввода
+    function showError(inputElement) {
+        inputElement.classList.add('error-input');
+    }
+
+    // Функция для удаления класса ошибки из поля ввода
+    function removeError(inputElement) {
+        inputElement.classList.remove('error-input');
+    }
+
+    // Обработчик события для проверки токена
+    checkTokenBtn.addEventListener('click', function () {
+        const token = tokenInput.value;
+
+        fetch('/check_token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: token })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Убираем ошибку с поля ввода
+                removeError(tokenInput);
+
+                // Обновляем статусы
+                connectionStatus.innerHTML = `
+                    <span class="badge text-success">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-check">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M5 12l5 5l10 -10" />
+                        </svg>
+                    </span> Подключено`;
+                tokenStatus.innerHTML = `
+                    <span class="badge text-success">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-check">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M5 12l5 5l10 -10" />
+                        </svg>
+                    </span> Проверено`;
+
+                // Активируем кнопку запуска бота и делаем её зелёной
+                startBotBtn.disabled = false;
+                startBotBtn.classList.remove('disabled-btn');
+                startBotBtn.classList.add('success-btn');
+
+                // Отображаем Bootstrap Alert
+                showBootstrapAlert('success', data.message);
+            } else {
+                // Показываем ошибку в поле ввода
+                showError(tokenInput);
+
+                // Обновляем статусы
+                connectionStatus.innerHTML = `
+                    <span class="badge text-danger">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-exclamation-circle">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+                            <path d="M12 9v4" />
+                            <path d="M12 16v.01" />
+                        </svg>
+                    </span> Не подключено`;
+                tokenStatus.innerHTML = `
+                    <span class="badge text-danger">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-exclamation-circle">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+                            <path d="M12 9v4" />
+                            <path d="M12 16v.01" />
+                        </svg>
+                    </span> Недоступно`;
+
+                // Деактивируем кнопку запуска бота
+                startBotBtn.disabled = true;
+                startBotBtn.classList.remove('success-btn');
+                startBotBtn.classList.add('disabled-btn');
+
+                // Отображаем Bootstrap Alert
+                showBootstrapAlert('danger', data.message);
+            }
+        });
+    });
+
+    // Обработчик события для запуска бота
+    startBotBtn.addEventListener('click', function () {
+        fetch('/start_bot', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            showBootstrapAlert(data.alert_type, data.message);
+        });
+    });
+
+    // Закрытие окна
+    document.getElementById('close-btn').addEventListener('click', function () {
+        fetch('/close', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+    });
+
+    // Сворачивание окна
+    document.getElementById('minimize-btn').addEventListener('click', function () {
+        fetch('/minimize', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+    });
+
+    // Логика перетаскивания окна
+    const titlebar = document.getElementById('titlebar');
+    let isDragging = false;
+    let startX, startY;
+
+    titlebar.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        startX = e.screenX;
+        startY = e.screenY;
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (isDragging) {
+            const deltaX = e.screenX - startX;
+            const deltaY = e.screenY - startY;
+            const newX = window.screenX + deltaX;
+            const newY = window.screenY + deltaY;
+
+            fetch('/move', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ x: newX, y: newY })
+            });
+
+            startX = e.screenX;
+            startY = e.screenY;
+        }
+    });
+
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+    });
+
+    // Функция для отображения алертов Bootstrap
+    function showBootstrapAlert(type, message) {
+        const alertContainer = document.getElementById('alert-container');
+
+        // Создаем новый алерт
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = [
+            `<div class="alert alert-${type} alert-dismissible fade show" role="alert">`,
+            `   ${message}`,
+            '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+            '</div>'
+        ].join('');
+
+        // Очищаем предыдущие алерты
+        alertContainer.innerHTML = '';
+
+        // Добавляем новый алерт
+        alertContainer.append(wrapper);
+    }
+});
+    </script>
+</body>
+</html>

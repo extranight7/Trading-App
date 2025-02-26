@@ -1,0 +1,186 @@
+* {font-family: montserrat;}
+/*1300 x 650 start frame*/
+.starter {
+    background: #e6e6e6;
+}
+.install {
+    background: #e6e6e6;
+}
+.start-1 {
+    background: #e6e6e6;
+    padding: 0px 40px 0px 40px;
+    border-radius: 20px;
+    padding-bottom: 20%;
+    padding-top: 10%;
+}
+.start-2 {
+    background-color: #688161;
+    padding: 40px;
+    height: 100%;
+    border-radius: 20px 00px 00px 20px;
+    background-image: url(pattern.png);
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+.start-area {
+    background: #d1d1d1;
+    border-radius: 15px;
+    border-style: none;
+    padding: 10px 20px;
+    font-size: 17px;
+}
+.start-bth {
+    color: #fff;
+    background: #688161;
+    border-radius: 0px 15px 15px 0px;
+}
+.start-btn:hover {background: #d1d1d1 !important;}
+.start-ticker-btn {
+    background: #d1d1d1;
+    border-radius: 15px;
+}
+.start-ticker-btn:hover {
+    background: #b3b3b3;
+}
+.ticker-btn {
+    background: #e4e4e4;
+    border-radius: 15px;
+}
+.ticker-btn:hover {
+    background: #d6d6d6;
+}
+.app-head {
+    height: 50px;
+    padding: 10px;
+    background: #e0e0e0;
+}
+.app-ticker-head {
+    height: 50px;
+    padding: 5px;
+    background: #bababa;
+}
+.app-plots {
+    height: 600px;
+    background: #7f7f7f;
+}
+.app-lots {
+    background: #c7c7c7ee;
+    height: 100%;
+}
+.app-h2 {padding-bottom: 10px;font-weight: 500;}
+
+.start-update-btn {
+    background-color: #9db697;
+   
+    border-radius: 14px;
+    color: #3e3e3e;
+    padding: 10px 40px;
+}
+.start-update-btn:hover {background-color: #b5daab;}
+.start-up-btn {
+    background-color: #9db697;
+   
+    border-radius: 14px;
+    color: #3e3e3e;
+    padding: 10px 20px;
+}
+.start-up-btn:hover {background-color: #b5daab;}
+.start-close-btn {
+    color: #505050;
+    float: right;
+}
+.start-close-btn:hover {color:white}
+.install-text {font-size: 25px;text-decoration: none;color:#3e3e3e;}
+.install-btn-big {
+    height: 70px;
+    font-size: 25px;
+    border-radius: 20px 20px 0px 0px;
+    background: #7f7f7f;
+    width: 100%;
+    margin-top: 5px;
+}
+.success-btn {
+    background: #688161;
+}
+.success-btn:hover {
+    background: #52674d;
+}
+.disabled-btn {background: #616161;}
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: transparent; /* Прозрачный фон тела */
+}
+.window-container {
+    width: 1000px;
+    height: 520px;
+    background-color: #ffffff; /* Белый фон окна */
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.custom-titlebar {
+    background-color: #e6e6e6;
+    color: rgb(48, 48, 48);
+    height: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+    font-size: 16px;
+    cursor: move;
+    user-select: none;
+}
+.titlebar-buttons button {
+    background: none;
+    border: none;
+    color: rgb(48, 48, 48);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0 10px;
+}
+.titlebar-buttons button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+.badge {border-radius: 360px;}
+.error-input {
+    background: #ff000014;
+}
+.start-tickers {height: 410px;}
+.last-tickers {height: 140px;}
+.h3-start-status {font-size: 30pt; color: white;}
+.start-timer {       
+    margin-top: 20px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+    .weekend-message {
+        font-size: 24pt;
+        color: orange;
+    }
+    .portfolio-section {
+        margin-top: 20px;
+        padding: 10px;
+        background: #f8f9fa;
+        border-radius: 5px;
+    }
+    .order-book {
+        margin-top: 10px;
+        font-size: 14px;
+    }
+    .bids { color: green; }
+    .asks { color: red; }
+    .orders-section {
+        margin-top: 20px;
+        padding: 10px;
+        background: #f8f9fa;
+        border-radius: 5px;
+        height: 250px;
+        height: 340px;
+        margin-bottom: 20px;
+    }

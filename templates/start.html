@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Trading Bot</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="static/style.css" rel="stylesheet">
+   
+</head>
+<body>
+    <div class="main">
+        <div class="starter">
+            <div class="startbox">
+                <div class="row">
+                    <div class="col-lg-5">
+                        <div class="start-1">
+                            <div class="start-tickers">
+                                <div class="row">
+                                    <div class="col-lg-8">
+                                        <h2 class="app-h2" id="greeting">Доброе утро</h2>
+                                    </div>
+                                    <div class="col-lg-4"> 
+                                        <button type="button" class="btn start-close-btn" id="close-app-btn">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-square-x">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                            <path d="M3 5a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-14z" />
+                                            <path d="M9 9l6 6m0 -6l-6 6" />
+                                        </svg>
+                                    </button></div>
+                                </div>
+                                
+                                <div class="input-group input-group-lg">
+                                    <input type="text" class="form-control start-area" id="ticker-input" aria-label="Sizing example input" placeholder="Введите название тикера..." aria-describedby="inputGroup-sizing-lg">
+                                    <button class="btn btn-outline-secondary start-bth" type="button" id="search-ticker-btn">Найти</button>
+                                </div>
+                                <div id="ticker-result" class="mt-3"></div>
+                                
+                                <hr>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-8">
+                                    <h4 style="padding-bottom: 10px;">Последние тикеры:</h4>
+                                </div>
+                                <div class="col-lg-4">
+                                    <button type="button" class="btn btn-sm btn-outline-danger" id="clear-tickers" style="display: none; border-radius: 50px; float: right;">Очистить</button>
+                                </div>
+                            </div>
+                            <div class="last-tickers overflow-y-auto">
+                                <div id="recent-tickers"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-7">
+                        <div class="start-2">
+                           
+                            <div class="portfolio-section overflow-y-auto">
+                                <h4>Портфель</h4>
+                                <div id="portfolio-result"></div>
+                            </div>
+                            <div class="orders-section overflow-y-auto overflow-x-hidden">
+                                <div id="order-book-result" class="order-book"></div>
+                            </div>
+                            <div class="start-timer" style="display: none;">
+                                <h3 class="h3-start-status" id="trading-status">Загрузка...</h3>
+                                <div id="timer" style="font-size: 24pt; color: white;"></div>
+                            </div>
+                            <button type="button" class="btn start-update-btn disabled" style="margin-right: 20px;">Обновления недоступны 
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-cloud-down">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                    <path d="M12 18.004h-5.343c-2.572 -.004 -4.657 -2.011 -4.657 -4.487c0 -2.475 2.085 -4.482 4.657 -4.482c.393 -1.762 1.794 -3.2 3.675 -3.773c1.88 -.572 3.956 -.193 5.444 1c1.488 1.19 2.162 3.007 1.77 4.769h.99c1.38 0 2.573 .813 3.13 1.99" />
+                                    <path d="M19 16v6" /><path d="M22 19l-3 3l-3 -3" />
+                                </svg>
+                            </button>
+                            <button type="button" class="btn start-up-btn" data-bs-toggle="modal" data-bs-target="#accountModal">
+                                Аккаунт 
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-user-circle">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                    <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+                                    <path d="M12 10m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
+                                    <path d="M6.168 18.849a4 4 0 0 1 3.832 -2.849h4a4 4 0 0 1 3.834 2.855" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно Аккаунт -->
+    <div class="modal fade" id="accountModal" tabindex="-1" aria-labelledby="accountModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="accountModalLabel">Информация об аккаунте</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Account ID:</strong> <span id="account-id">Загрузка...</span></p>
+                    <p><strong>Название счёта:</strong> <span id="account-name">Загрузка...</span></p>
+                    <p><strong>Статус токена:</strong> <span id="token-status">Загрузка...</span></p>
+                    <p><strong>Баланс:</strong> <span id="account-balance">Загрузка...</span></p>
+                    <div class="mb-3">
+                        <label for="timezone-select" class="form-label"><strong>Часовой пояс:</strong></label>
+                        <select class="form-select" id="timezone-select">
+                            <option value="Europe/Kaliningrad">Калининград (UTC+2)</option>
+                            <option value="Europe/Moscow" selected>Москва (UTC+3)</option>
+                            <option value="Europe/Samara">Самара (UTC+4)</option>
+                            <option value="Asia/Yekaterinburg">Екатеринбург (UTC+5)</option>
+                            <option value="Asia/Omsk">Омск (UTC+6)</option>
+                            <option value="Asia/Novosibirsk">Новосибирск (UTC+7)</option>
+                            <option value="Asia/Krasnoyarsk">Красноярск (UTC+7)</option>
+                            <option value="Asia/Irkutsk">Иркутск (UTC+8)</option>
+                            <option value="Asia/Yakutsk">Якутск (UTC+9)</option>
+                            <option value="Asia/Vladivostok">Владивосток (UTC+10)</option>
+                            <option value="Asia/Magadan">Магадан (UTC+11)</option>
+                            <option value="Asia/Sakhalin">Сахалин (UTC+11)</option>
+                            <option value="Asia/Kamchatka">Камчатка (UTC+12)</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary mt-2" id="save-timezone-btn">Сохранить</button>
+                    <button class="btn btn-outline-danger mt-2" id="reset-bot-btn" style="color: white !important;">Удалить токен и перезапустить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="static/start.js"></script>
+</body>
+</html>
